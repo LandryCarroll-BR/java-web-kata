@@ -21,7 +21,7 @@ public class TodoController {
             String title = io.readInput("title");
             String description = io.readInput("description");
             Todo newTodo = new Todo(title, description);
-            todos.addTodo(newTodo);
+            Todo createdTodo = todos.addTodo(newTodo);
             io.writeOutput("Successfully added new todo with ID of: " + newTodo.getId());
             return true;
         } catch (Exception ex) {
@@ -34,8 +34,8 @@ public class TodoController {
         try {
             String todoId = io.readInput("id");
             UUID id = UUID.fromString(todoId);
-            todos.deleteTodo(id);
-            io.writeOutput("Successfully deleted todo with ID of: " + id);
+            UUID deletedId = todos.deleteTodo(id);
+            io.writeOutput("Successfully deleted todo with ID of: " + deletedId);
             return true;
         } catch (Exception ex) {
             io.sendError("Error: " + ex.getMessage() + ", please try again.");
@@ -65,12 +65,11 @@ public class TodoController {
 
             if (existingTodo.isPresent()) {
                 existingTodo.setCompleted(!existingTodo.isCompleted());
-                todos.updateTodo(existingTodo);
+                Todo updatedTodo = todos.updateTodo(existingTodo);
                 return true;
             } else {
                 throw new TodoExceptions.TodoDoesNotExistException("Todo with id " + todoId + " does not exist.");
             }
-
         } catch (Exception ex) {
             io.sendError("Error: " + ex.getMessage() + ", please try again.");
             return false;

@@ -25,11 +25,6 @@ public class ViewTodosServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        WebUserIO io = new WebUserIO(req, resp);
-        TodoController controller = new TodoController(io, todoRepository);
-
-        controller.viewTodos();
-
         req.setAttribute("todos", todoRepository.viewTodos());
         req.getRequestDispatcher("/todos.jsp").forward(req, resp);
     }

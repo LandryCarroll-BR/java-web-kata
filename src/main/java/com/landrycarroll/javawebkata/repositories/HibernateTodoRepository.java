@@ -3,6 +3,7 @@ package com.landrycarroll.javawebkata.repositories;
 import com.landrycarroll.javawebkata.config.Hibernate;
 import com.landrycarroll.javawebkata.entities.Todo;
 import com.landrycarroll.javawebkata.exceptions.TodoExceptions;
+import jakarta.persistence.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -62,7 +63,7 @@ public class HibernateTodoRepository implements TodoRepository {
     @Override
     public List<Todo> viewTodos() {
         try (Session session = this.sessionFactory.openSession()) {
-            return session.createQuery("from Todo", Todo.class).list();
+            return session.createQuery("from Todo", Todo.class).setMaxResults(10).list();
         } catch (Exception e) {
             throw new RuntimeException("Failed to get Todos: " + e.getMessage(), e);
         }
