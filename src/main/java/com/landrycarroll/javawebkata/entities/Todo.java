@@ -14,10 +14,10 @@ import java.util.UUID;
 public class Todo {
 
     @Id
-    @Column(updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false, columnDefinition = "CHAR(36)")
     private UUID id;
 
-    @Column(name = "title")
+    @Column(name = "title", length = 255)
     private String title;
 
     @Column(name = "description")
@@ -38,7 +38,7 @@ public class Todo {
     }
 
     private void validateTitle(String title) throws TodoExceptions.InvalidInputException {
-        int MAXIMUM_TITLE_LENGTH = 50;
+        int MAXIMUM_TITLE_LENGTH = 255;
 
         if (title.length() > MAXIMUM_TITLE_LENGTH) {
             throw new TodoExceptions.InvalidInputException("Title exceeds maximum length of " + MAXIMUM_TITLE_LENGTH);

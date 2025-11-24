@@ -7,6 +7,7 @@ import jakarta.persistence.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,13 +20,34 @@ public class HibernateTodoRepository implements TodoRepository {
 
     @Override
     public Todo addTodo(Todo todo) {
-        try (Session session = this.sessionFactory.openSession()) {
-            session.getTransaction().begin();
-            session.persist(todo);
-            session.getTransaction().commit();
+        try (Session session = sessionFactory.openSession()) {
+
+            session.doWork(conn -> {
+                System.out.println(">>> URL Used by JDBC: " + conn.getMetaData().getURL());
+            });
+
+            // ❌ VULNERABLE: raw concatenation of user input
+            String sql =
+                    "INSERT INTO todos (id, title, description, is_complete) VALUES (" +
+                            "'" + todo.getId() + "', " +
+                            "'" + todo.getTitle() + "', " +
+                            "'" + todo.getDescription() + "', " +
+                            (todo.isCompleted() ? "1" : "0") +
+                            ");";
+
+            System.out.println("🚨 Executing SQL: " + sql);
+
+            session.doWork(connection -> {
+                try (Statement stmt = connection.createStatement()) {
+                    stmt.execute(sql);
+                    stmt.execute(todo.getTitle());
+                }
+            });
+
+
             return todo;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to add Todo: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to execute SQL: " + e.getMessage(), e);
         }
     }
 
